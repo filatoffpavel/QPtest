@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace SumNumerals
 {
@@ -8,13 +8,16 @@ namespace SumNumerals
         {
             keySniffer();
         }
-        
+
         static void keySniffer()
         {
-            Console.WriteLine("Enter an integer:");
+            Console.WriteLine("Please enter an integer value:");
             char ch = Char.MinValue;
+            char stringEnd = '\r';
             int x = 0;
-            bool fitstSimbol = true;
+            int zeroASCIIcod = 48;
+            bool firstSymbol = true;
+            bool noWrongSymbol = false;
             long maxSum = 0, tempSum = 0;
             ConsoleKeyInfo keyInfo;
             while (true)
@@ -24,23 +27,25 @@ namespace SumNumerals
                     keyInfo = Console.ReadKey();
                     try
                     {
-                        if (fitstSimbol)
+                        if (firstSymbol)
                         {
-                            fitstSimbol = false;
-                            if (keyInfo.Key == ConsoleKey.Subtract || keyInfo.Key == ConsoleKey.Add)
+                            firstSymbol = false;
+                            if (keyInfo.Key == ConsoleKey.Subtract || keyInfo.Key == ConsoleKey.OemMinus || keyInfo.Key == ConsoleKey.Add || (keyInfo.Key == ConsoleKey.OemPlus && keyInfo.Modifiers == ConsoleModifiers.Shift))
                                 continue;
                         }
 
                         ch = keyInfo.KeyChar;
-                        x = ch - 48;
+                        x = ch - zeroASCIIcod;
                         if (x > -1 && x < 10)
                         {
+                            noWrongSymbol = true;
                             tempSum += x;
                         }
-                        else if (ch != '\r')
+                        else if (ch != stringEnd)
                         {
-                            Console.WriteLine("Wrong character");
-                            //tempSum = 0;  //раскоментировать, если надо дать возможность продолжить ввод нового числа
+                            noWrongSymbol = false;
+                            Console.WriteLine(" Wrong character");
+                            tempSum = 0;
                             break;
                         }
                     }
@@ -54,9 +59,7 @@ namespace SumNumerals
 
                 Console.WriteLine(Environment.NewLine);
 
-                fitstSimbol = true;
-
-                if (tempSum == 0)
+                if (tempSum == 0 && noWrongSymbol)
                     break;
 
                 if (maxSum < tempSum)
@@ -65,9 +68,11 @@ namespace SumNumerals
                 }
 
                 tempSum = 0;
+                noWrongSymbol = false;
+                firstSymbol = true;
             }
 
-            Console.WriteLine("The biggest sume of digits is:{0}", maxSum);
+            Console.WriteLine("Maximum digit sum is:{0}", maxSum);
             Console.ReadLine();
         }
     }
